@@ -41,14 +41,19 @@ class HUDUpdater
 
     doc = Nokogiri::XML(open(GROUP_URL))
     doc.css('item').each do |item|
-      m = /Release (\d+)/.match item.at_css('title').content
+      title = item.at_css('title').content
+      m = /Release (\d+)/.match title
       if m
         version = m[1]
-        url = /http:\/\/.+\.zip/.match(item.at_css('description'))[0]
+        desc = item.at_css('description').content
+        url = /http:\/\/.+\.zip/.match(desc)
+        next unless url
         if !File.exist?(DL_PATH) || last_id.to_s != version
           puts 'Downloading new file'
-          load_update url
+          load_update url[0]
           @cfg[:version] = version
+          @cfg[:title] = title
+          @cfg[:desc] = desc.gsub(url[0], '').strip
           save_config
           return true
         end

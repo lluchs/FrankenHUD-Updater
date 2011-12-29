@@ -10,35 +10,45 @@ class Shoes
   end
 end
 
-Shoes.app title: 'FrankenHUD Updater' do
+Shoes.app title: 'FrankenHUD Updater', width: 800, height: 600 do
   icon 'game.ico'
+  TEXT_COLOR = gray(54 / 255)
+  TITLE_COLOR = rgb(179, 82, 21)
+  TITLE_SIZE = 28
+  SUBTITLE_SIZE = 20
   @updater = HUDUpdater.new
   def check_update(force)
     if @updater.look_for_update force
       @content.clear
       @content.append do
-        @updater.extras.each_key do |opt|
-          flow do
-            ch = check
-            ch.checked = @updater.cfg[:extras].include? opt
-            ch.click do |c|
-              if c.checked?
-                @updater.cfg[:extras] << opt
-              else
-                @updater.cfg[:extras].delete opt
+        stack width: 0.5 do
+          @updater.extras.each_key do |opt|
+            flow do
+              ch = check
+              ch.checked = @updater.cfg[:extras].include? opt
+              ch.click do |c|
+                if c.checked?
+                  @updater.cfg[:extras] << opt
+                else
+                  @updater.cfg[:extras].delete opt
+                end
+                @updater.save_config
               end
-              @updater.save_config
+              para opt, width: 300, stroke: TEXT_COLOR
             end
-            para opt, width: 500, stroke: gray(54 / 255)
+          end
+          button 'Apply' do
+            dest = @users[@updater.cfg[:user]]
+            if dest && File.directory?(dest)
+              @updater.apply_update dest
+            else
+              alert 'No valid user selected!'
+            end
           end
         end
-        button 'Apply' do
-          dest = @users[@updater.cfg[:user]]
-          if dest && File.directory?(dest)
-            @updater.apply_update dest
-          else
-            alert 'No valid user selected!'
-          end
+        stack width: 0.5 do
+          subtitle @updater.cfg[:title], size: SUBTITLE_SIZE
+          para @updater.cfg[:desc], stroke: TEXT_COLOR
         end
       end
     end
@@ -72,7 +82,7 @@ Shoes.app title: 'FrankenHUD Updater' do
 
   background rgb(210, 205, 200)
   stack margin: 10 do
-    title 'FrankenHUD Updater', stroke: rgb(179, 82, 21), size: 28, weight: 'bold'
+    title 'FrankenHUD Updater', stroke: TITLE_COLOR, size: TITLE_SIZE, weight: 'bold'
     button('Check for update') { check_update true }
     user_box = list_box items: valid_users
     user_box.choose @updater.cfg[:user] if @updater.cfg[:user]
@@ -81,7 +91,7 @@ Shoes.app title: 'FrankenHUD Updater' do
       @updater.cfg[:user] = user
       @updater.save_config
     end
-    @content = stack do
+    @content = flow do
       subtitle 'Please update.'
     end
   end
