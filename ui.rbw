@@ -1,4 +1,6 @@
-require './frankenhud.rb'
+$:.unshift File.dirname($0) # OCRA loading
+
+require 'frankenhud.rb'
 require 'green_shoes'
 require 'win32/registry'
 
@@ -11,7 +13,7 @@ class Shoes
 end
 
 Shoes.app title: 'FrankenHUD Updater', width: 800, height: 600 do
-  icon 'game.ico'
+  icon File.join(File.dirname($0), 'game.ico')
   TEXT_COLOR = gray(54 / 255)
   TITLE_COLOR = rgb(179, 82, 21)
   TITLE_SIZE = 28

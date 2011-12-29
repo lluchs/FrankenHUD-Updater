@@ -8,7 +8,7 @@ require 'fileutils'
 
 class HUDUpdater
   GROUP_URL = 'http://steamcommunity.com/groups/frankenhud/rss'
-  DL_PATH = 'dl/hud.zip'
+  DL_PATH = 'hud.zip'
 
   attr_reader :extras
   attr_accessor :cfg
